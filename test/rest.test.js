@@ -951,6 +951,29 @@ describe('strong-remoting-rest', function() {
         });
     });
 
+    it('should coerce integer to number', function(done) {
+      remotes.foo = {
+        bar: function(a, b, fn) {
+          fn(null, a + b);
+        },
+      };
+
+      var fn = remotes.foo.bar;
+
+      fn.shared = true;
+      fn.accepts = [
+        { arg: 'a', type: 'integer' },
+        { arg: 'b', type: 'integer' },
+      ];
+      fn.returns = { root: true };
+
+      json('get', '/foo/bar?a=53&b=2')
+        .expect(200, function(err, res) {
+          assert.equal(res.body, 55);
+          done();
+        });
+    });
+
     it('should coerce contents of array with simple array types', function(done) {
       remotes.foo = {
         bar: function(a, fn) {
@@ -2253,6 +2276,8 @@ describe('strong-remoting-rest', function() {
   });
 
   it('rejects multi-item array passed to a number argument', function(done) {
+    /* it rejects multi-item array passed to integer argument
+     as it coerces to number type */
     var method = givenSharedStaticMethod(
       function(arg, cb) { cb(); },
       { accepts: { arg: 'arg', type: 'number' }});

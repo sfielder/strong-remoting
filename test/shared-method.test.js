@@ -146,6 +146,50 @@ describe('SharedMethod', function() {
       });
     });
 
+    it('returns 400 when integer argument is float number',
+      function(done) {
+        var method = givenSharedMethod({
+          accepts: [{ arg: 'num', type: 'integer' }],
+        });
+
+        method.invoke('ctx', { num: NaN }, function(err) {
+          setImmediate(function() {
+            expect(err).to.exist;
+            expect(err.message).to.match(/integer/i);
+            expect(err.statusCode).to.equal(400);
+            done();
+          });
+        });
+      });
+
+    it('returns 400 when integer argument is `NaN`', function(done) {
+      var method = givenSharedMethod({
+        accepts: [{ arg: 'num', type: 'integer' }],
+      });
+
+      method.invoke('ctx', { num: NaN }, function(err) {
+        setImmediate(function() {
+          expect(err).to.exist;
+          expect(err.message).to.match(/integer/i);
+          expect(err.statusCode).to.equal(400);
+          done();
+        });
+      });
+    });
+
+    it('treats number argument of type x.0 as number', function(done) {
+      var method = givenSharedMethod({
+        accepts: [{ arg: 'num', type: 'number' }],
+      });
+
+      method.invoke('ctx', { num: 12.0 }, function(err) {
+        setImmediate(function() {
+          expect(err).to.be.null;
+          done();
+        });
+      });
+    });
+
     it('returns 400 and doesn\'t crash with unparsable object', function(done) {
       var method = givenSharedMethod({
         accepts: [{ arg: 'obj', type: 'object' }],
