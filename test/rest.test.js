@@ -1009,7 +1009,7 @@ describe('strong-remoting-rest', function() {
             .expect(200, { sum: 5 }, done);
         });
 
-      it.skip('supports return type [integer]',
+      it('supports return type [integer]',
         function(done) {
           var method = givenSharedStaticMethod(
             function(arg, cb) {
