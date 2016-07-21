@@ -145,9 +145,34 @@ describe('SharedMethod', function() {
         });
       });
     });
+    describe('data type: integer', function() {
+      describe('SharedMethod.getType - determine actual type based on value', function() {
+        it('returns type: number for decimal value & integer target type',
+          function() {
+            expect(SharedMethod.getType(15.2, 'integer')).to.equal('number');
+          });
+        it('returns type:integer for intiger value & integer target type',
+          function() {
+            expect(SharedMethod.getType(14, 'integer')).to.equal('integer');
+          });
+      });
+      it('returns 400 when integer argument is a decimal number',
+        function(done) {
+          var method = givenSharedMethod({
+            accepts: [{ arg: 'num', type: 'integer' }],
+          });
 
-    it('returns 400 when integer argument is float number',
-      function(done) {
+          method.invoke('ctx', { num: 2.5 }, function(err) {
+            setImmediate(function() {
+              expect(err).to.exist;
+              expect(err.message).to.match(/integer/i);
+              expect(err.statusCode).to.equal(400);
+              done();
+            });
+          });
+        });
+
+      it('returns 400 when integer argument is `NaN`', function(done) {
         var method = givenSharedMethod({
           accepts: [{ arg: 'num', type: 'integer' }],
         });
@@ -162,30 +187,19 @@ describe('SharedMethod', function() {
         });
       });
 
-    it('returns 400 when integer argument is `NaN`', function(done) {
-      var method = givenSharedMethod({
-        accepts: [{ arg: 'num', type: 'integer' }],
-      });
+      it('treats integer argument of type x.0 as integer', function(done) {
+        var method = givenSharedMethod(function(arg, cb) {
+          return cb({ 'num': arg });
+        },
+          {
+            accepts: [{ arg: 'num', type: 'integer' }],
+          });
 
-      method.invoke('ctx', { num: NaN }, function(err) {
-        setImmediate(function() {
-          expect(err).to.exist;
-          expect(err.message).to.match(/integer/i);
-          expect(err.statusCode).to.equal(400);
-          done();
-        });
-      });
-    });
-
-    it('treats number argument of type x.0 as number', function(done) {
-      var method = givenSharedMethod({
-        accepts: [{ arg: 'num', type: 'number' }],
-      });
-
-      method.invoke('ctx', { num: 12.0 }, function(err) {
-        setImmediate(function() {
-          expect(err).to.be.null;
-          done();
+        method.invoke('ctx', { num: '12.0' }, function(result) {
+          setImmediate(function() {
+            expect(result.num).to.equal(12);
+            done();
+          });
         });
       });
     });
