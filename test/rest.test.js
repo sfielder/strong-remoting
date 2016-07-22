@@ -974,7 +974,7 @@ describe('strong-remoting-rest', function() {
           });
       });
 
-      it('supports taget type [integer]', function(done) {
+      it('supports target type [integer]', function(done) {
         var method = givenSharedStaticMethod(
           function(arg, cb) {
             cb(null, { value: arg });
@@ -991,41 +991,22 @@ describe('strong-remoting-rest', function() {
           .end(done);
       });
 
-      it('converts decimal value to integer if return type: integer',
-        function(done) {
-          var method = givenSharedStaticMethod(
-            function(a, b, cb) {
-              cb(null, a + b);
-            },
-            {
-              accepts: [
-                { arg: 'a', type: 'number' },
-                { arg: 'b', type: 'number' }],
-              returns: { arg: 'sum', type: 'integer' },
-            }
-          );
+      it('supports return type [integer]', function(done) {
+        var method = givenSharedStaticMethod(
+          function(arg, cb) {
+            cb(null, [arg[0], arg[1]]);
+          },
+          {
+            accepts: { arg: 'arg', type: ['number'] },
+            returns: { arg: 'data', type: ['integer'] },
+            http: { method: 'POST' },
+          });
 
-          json(method.url + '?a=3.4&b=2.1')
-            .expect(200, { sum: 5 }, done);
-        });
-
-      it('supports return type [integer]',
-        function(done) {
-          var method = givenSharedStaticMethod(
-            function(arg, cb) {
-              cb(null,  [arg[0] + arg[1]]);
-            },
-            {
-              accepts: { arg: 'arg', type: ['number'] },
-              returns: { arg: 'data', type: ['integer'] },
-              http: { method: 'POST' },
-            });
-
-          request(app).post(method.url)
-            .send({ arg: [1.5, 2] })
-            .expect(200, { data: [3] })
-            .end(done);
-        });
+        request(app).post(method.url)
+          .send({ arg: [1, 2] })
+          .expect(200, { data: [1, 2] })
+          .end(done);
+      });
     });
 
 

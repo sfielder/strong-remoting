@@ -156,6 +156,7 @@ describe('SharedMethod', function() {
             expect(SharedMethod.getType(14, 'integer')).to.equal('integer');
           });
       });
+
       it('returns 400 when integer argument is a decimal number',
         function(done) {
           var method = givenSharedMethod({
@@ -202,8 +203,29 @@ describe('SharedMethod', function() {
           });
         });
       });
-    });
 
+      it('returns 500 for non-integer return value if type: `integer`',
+        function(done) {
+          var method = givenSharedMethod(
+            function(cb) {
+              cb(null, 3.141);
+            },
+            {
+              returns: [
+                { arg: 'value', type: 'integer' },
+              ],
+            });
+
+          method.invoke('ctx', {}, function(err, result) {
+            setImmediate(function() {
+              expect(err).to.exist;
+              expect(err.message).to.match(/integer/i);
+              expect(err.statusCode).to.equal(500);
+              done();
+            });
+          });
+        });
+    });
     it('returns 400 and doesn\'t crash with unparsable object', function(done) {
       var method = givenSharedMethod({
         accepts: [{ arg: 'obj', type: 'object' }],
