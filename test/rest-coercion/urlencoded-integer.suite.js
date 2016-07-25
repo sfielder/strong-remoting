@@ -49,12 +49,12 @@ function suite(prefix, ctx) {
       ['arg=1', 1],
       ['arg=-1', -1],
 
-      // Numbers larger than MAX_SAFE_INTEGER get trimmed
-      ['arg=2343546576878989879789', 2.34354657687899e+21],
-      ['arg=-2343546576878989879789', -2.34354657687899e+21],
+      // Numbers larger than MAX_SAFE_INTEGER should trigger ERROR_BAD_REQUEST
+      ['arg=2343546576878989879789', ERROR_BAD_REQUEST],
+      ['arg=-2343546576878989879789', ERROR_BAD_REQUEST],
       // Scientific notation
-      ['arg=1.234e%2B30', 1.234e+30],
-      ['arg=-1.234e%2B30', -1.234e+30],
+      ['arg=1.234e%2B3', 1.234e+3],
+      ['arg=-1.234e%2B3', -1.234e+3],
 
       // Invalid values should trigger ERROR_BAD_REQUEST
       ['arg=1.2', ERROR_BAD_REQUEST],

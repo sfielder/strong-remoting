@@ -40,24 +40,26 @@ module.exports = function(ctx) {
       [{ arg: 1 }, 1],
       [{ arg: -1 }, -1],
 
-      // Integers larger than MAX_SAFE_INTEGER get trimmed
-      [{ arg: 2343546576878989879789 }, 2.34354657687899e+21],
-      [{ arg: -2343546576878989879789 }, -2.34354657687899e+21],
+      // Integers larger than MAX_SAFE_INTEGER should trigger ERROR_BAD_REQUEST
+      [{ arg: 2343546576878989879789 }, ERROR_BAD_REQUEST],
+      [{ arg: -2343546576878989879789 }, ERROR_BAD_REQUEST],
 
       // Scientific notation works
-      [{ arg: 1.234e+30 }, 1.234e+30],
-      [{ arg: -1.234e+30 }, -1.234e+30],
+      [{ arg: 1.234e+3 }, 1.234e+3],
+      [{ arg: -1.234e+3 }, -1.234e+3],
 
-      // Integer-like string values should not trigger ERROR_BAD_REQUEST
+      // Integer-like string values should trigger ERROR_BAD_REQUEST
       [{ arg: '0' }, 0],
       [{ arg: '1' }, 1],
       [{ arg: '-1' }, -1],
-      [{ arg: '2343546576878989879789' }, 2.34354657687899e+21],
-      [{ arg: '-2343546576878989879789' }, -2.34354657687899e+21],
-      [{ arg: '1.234e+30' }, 1.234e+30],
-      [{ arg: '-1.234e+30' }, -1.234e+30],
+      [{ arg: '2343546576878989879789' }, ERROR_BAD_REQUEST],
+      [{ arg: '-2343546576878989879789' }, ERROR_BAD_REQUEST],
+      [{ arg: '1.234e+30' }, ERROR_BAD_REQUEST],
+      [{ arg: '-1.234e+30' }, ERROR_BAD_REQUEST],
 
       // All other non-integer values should trigger ERROR_BAD_REQUEST
+      [{ arg: 1.2 }, ERROR_BAD_REQUEST],
+      [{ arg: -1.2 }, ERROR_BAD_REQUEST],
       [{ arg: '1.2' }, ERROR_BAD_REQUEST],
       [{ arg: '-1.2' }, ERROR_BAD_REQUEST],
       [{ arg: '' }, 0],
